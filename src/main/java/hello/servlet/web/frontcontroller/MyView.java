@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class MyView {
     private String viewPath;
@@ -18,5 +19,11 @@ public class MyView {
         RequestDispatcher requestDispatcher = request.getRequestDispatcher(viewPath);
         requestDispatcher.forward(request, response);
 
+    }
+
+    public void render(Map<String, Object> model,HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+        model.forEach((key,value) -> request.setAttribute(key,value));
+        RequestDispatcher requestDispatcher = request.getRequestDispatcher(viewPath);
+        requestDispatcher.forward(request, response);
     }
 }
