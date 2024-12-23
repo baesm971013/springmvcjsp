@@ -6,38 +6,53 @@ import hello.servlet.web.frontcontroller.v3.controller.MemberFormControllerV3;
 import hello.servlet.web.frontcontroller.v3.controller.MemberListControllerV3;
 import hello.servlet.web.frontcontroller.v3.controller.MemberSaveControllerV3;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.annotation.WebServlet;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-@WebServlet(name = "frontControllerServletV3", urlPatterns = "/front-controller/v3/*")
+@WebServlet(name="frontControllerServletV3", urlPatterns = "/front-controller/v3/*")
 public class FrontControllerServletV3 extends HttpServlet {
     private Map<String, ControllerV3> controllerMap = new HashMap<>();
-
     public FrontControllerServletV3(){
         controllerMap.put("/front-controller/v3/members/new-form", new MemberFormControllerV3());
         controllerMap.put("/front-controller/v3/members/save", new MemberSaveControllerV3());
         controllerMap.put("/front-controller/v3/members", new MemberListControllerV3());
     }
-
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
-        Map<String,String> paramMap = new HashMap<>();
-        request.getParameterNames().
-                asIterator().forEachRemaining(paramName -> paramMap.put(paramName, request.getParameter(paramName)));
-        ControllerV3 controllerV3 = controllerMap.get(requestURI);
-        ModelView modelView = controllerV3.process(paramMap);
+        ControllerV3 controller = controllerMap.get(requestURI);
 
-        String viewName = modelView.getViewName();
+        // create
+        Map<String, String> paramMap = createParamMap(request);
 
-        MyView myView = new MyView("/WEB-INF/views/" + viewName + ".jsp");
-        myView.render(modelView.getModel(), request, response);
 
+        // process로 진행 시켜 Model 반환받는다
+        ModelView mv = controller.process(paramMap);
+
+
+        // new-form
+        String viewName = mv.getViewName();
+
+        MyView myView = new MyView("/WEB-INF/views/"+viewName+".jsp");
+        System.out.println("model");
+        System.out.println(mv.getModel());
+        myView.render(mv.getModel(), request, response);
 
     }
+
+    private static Map<String, String> createParamMap(HttpServletRequest request) {
+        // paramMap 생성
+        Map<String, String> paramMap = new HashMap<>();
+        // request로 받은 parameter 닫 paramMap에 넣기
+        request.getParameterNames().asIterator()
+                .forEachRemaining(paramName ->paramMap.put(paramName, request.getParameter(paramName)));
+        return paramMap;
+    }
+
 }
