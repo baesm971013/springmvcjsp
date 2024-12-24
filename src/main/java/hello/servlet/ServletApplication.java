@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 
-@ServletComponentScan
+@ServletComponentScan // 이거하면 restcontroller 안됨
 @SpringBootApplication
 public class ServletApplication {
 
